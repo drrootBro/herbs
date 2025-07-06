@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>纽叔经方 · 感冒汤剂推荐</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: #f0f3f5;
+      padding: 40px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+    #main {
+      background: #fff;
+      max-width: 640px;
+      margin: auto;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    #question {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #0077aa;
+    }
+    #options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px 18px;
+      background: linear-gradient(90deg, #4CAF50, #66BB6A);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    #options button:hover {
+      background: linear-gradient(90deg, #43A047, #66BB6A);
+      transform: scale(1.02);
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #c0392b;
+    }
+    #controls {
+      text-align: center;
+      margin-top: 25px;
+    }
+    #controls button {
+      margin: 5px 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: #3498db;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    #controls button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dr RootBro · 病毒感冒经方推荐</h1>
+  <div id="main">
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="result"></div>
+    <div id="controls">
+      <button id="back">← 上一步</button>
+      <button id="restart">重置</button>
+    </div>
+  </div>
+
+  <script>
+    const tree = {
+      question: "如果发烧，请选择情况",
+      options: {
+        "无汗": {
+          question: "是否咳嗽？",
+          options: {
+            "咳嗽": {
+              question: "痰颜色？",
+              options: {
+                "怕冷、口渴、黄痰": { result: "推荐方剂：大青龙汤" },
+                "怕冷、口渴、白痰": { result: "推荐方剂：小青龙汤" }
+              }
+            },
+            "无咳嗽": {
+              question: "口渴？",
+              options: {
+                "怕冷、口渴": { result: "推荐方剂：葛根汤" },
+                "怕冷、口不渴": { result: "推荐方剂：麻黄汤" }
+              }
+            }
+          }
+        },
+        "有汗": {
+          question: "是否咳嗽？",
+          options: {
+            "咳嗽": {
+              question: "口渴？痰是什么颜色？",
+              options: {
+                "口渴、黄痰": { result: "推荐方剂：麻杏甘石汤" },
+                "怕冷、白痰": { result: "推荐方剂：桂枝加厚朴杏子汤" }
+              }
+            },
+            "无咳嗽": {
+              question: "口渴？",
+              options: {
+                "怕冷、口渴": { result: "推荐方剂：桂枝汤 + 葛根汤" },
+                "怕冷、口不渴": {
+                  result: "推荐方剂：桂枝汤<br><small>桂枝9克（去皮） 芍药9克 炙甘草6克 生姜9克（切片） 大枣12枚（掰开）</small>"
+                }
+              }
+            }
+          }
+        },
+        "女子经期感冒或者忽冷忽热": {
+          result: "推荐方剂：小柴胡汤（少阳证：寒热往来、想吐）"
+        },
+        "肠胃型（上吐下泻）": {
+          result: "推荐方剂：五苓散"
+        }
+      }
+    };
+
+    let path = [];
+    let current = tree;
+
+    const Q = document.getElementById("question");
+    const O = document.getElementById("options");
+    const R = document.getElementById("result");
+    const backBtn = document.getElementById("back");
+    const restartBtn = document.getElementById("restart");
+
+    function render() {
+      R.innerHTML = "";
+      Q.textContent = current.question || "";
+      O.innerHTML = "";
+
+      if (!current.options) {
+        Q.textContent = "✅ 辨证推荐结果：";
+        R.innerHTML = current.result;
+        return;
+      }
+
+      for (let key in current.options) {
+        const btn = document.createElement("button");
+        btn.textContent = key;
+        btn.onclick = () => {
+          path.push(current);
+          current = current.options[key];
+          render();
+        };
+        O.appendChild(btn);
+      }
+    }
+
+    backBtn.onclick = () => {
+      if (path.length > 0) {
+        current = path.pop();
+        R.innerHTML = "";
+        render();
+      }
+    };
+
+    restartBtn.onclick = () => {
+      current = tree;
+      path = [];
+      R.innerHTML = "";
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>
